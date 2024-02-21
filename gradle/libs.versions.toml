@@ -1,0 +1,11 @@
+[versions]
+kotlin = "1.9.22"
+mavenPublishVanniktech = "0.27.0"
+jna = "5.14.0"
+
+[libraries]
+jna-platform = { module = "net.java.dev.jna:jna-platform", version.ref = "jna" }
+
+[plugins]
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+mavenPublishVanniktech = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublishVanniktech" }
