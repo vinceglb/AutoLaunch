@@ -1,0 +1,37 @@
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.File
+
+internal class PlatformAutoLaunchMacOS(private val config: AutoLaunchConfig) : PlatformAutoLaunch {
+    private val file =
+        File("${System.getProperty("user.home")}/Library/LaunchAgents/${config.appName}.plist")
+
+    override suspend fun isEnabled(): Boolean = withContext(Dispatchers.IO) {
+        file.exists()
+    }
+
+    override suspend fun enable(): Unit = withContext(Dispatchers.IO) {
+        file.writeText(
+            """
+            |<?xml version="1.0" encoding="UTF-8"?>
+            |<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+            |<plist version="1.0">
+            |<dict>
+            |    <key>Label</key>
+            |    <string>${config.appName}</string>
+            |    <key>ProgramArguments</key>
+            |    <array>
+            |        <string>${config.appPath}</string>
+            |    </array>
+            |    <key>RunAtLoad</key>
+            |    <true/>
+            |</dict>
+            |</plist>
+            """.trimMargin()
+        )
+    }
+
+    override suspend fun disable(): Unit = withContext(Dispatchers.IO) {
+        file.delete()
+    }
+}
