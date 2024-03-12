@@ -1,13 +1,17 @@
 [versions]
-kotlin = "1.9.22"
+compose-plugin = "1.6.0"
+kermit = "2.0.3"
+kotlin = "2.0.0-Beta4"
 kotlin-coroutines = "1.8.0"
 mavenPublishVanniktech = "0.27.0"
 jna = "5.14.0"
 
 [libraries]
 jna-platform = { module = "net.java.dev.jna:jna-platform", version.ref = "jna" }
+kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
 
 [plugins]
+jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 mavenPublishVanniktech = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublishVanniktech" }
