@@ -1,11 +1,7 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.mavenPublishVanniktech)
-    id("maven-publish")
 }
-
-group = "io.github.vinceglb"
-version = "0.1.0"
 
 kotlin {
     jvm()
