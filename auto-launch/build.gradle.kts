@@ -9,6 +9,7 @@ version = "0.1.0"
 
 kotlin {
     jvm()
+    jvmToolchain(17)
     
     sourceSets {
         commonMain.dependencies {
@@ -18,6 +19,10 @@ kotlin {
             // JNA Platform
             // https://github.com/java-native-access/jna/tree/master?tab=readme-ov-file
             implementation(libs.jna.platform)
+
+            // Kermit logger
+            // https://github.com/touchlab/Kermit?tab=readme-ov-file
+            implementation(libs.kermit)
         }
     }
 }
