@@ -1,3 +1,5 @@
+package io.github.vinceglb.autolaunch
+
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
