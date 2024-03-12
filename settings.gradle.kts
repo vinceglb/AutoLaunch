@@ -17,3 +17,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "AutoLaunchKotlin"
 include(":auto-launch")
+include(":sample")
