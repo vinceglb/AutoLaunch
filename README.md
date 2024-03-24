@@ -57,7 +57,7 @@ val isDistributable = AutoLaunch.isRunningFromDistributable
 ### 🔧 Customizing the application path
 
 By default, your application path is detected automatically. You can customize the application path that will be launched at startup:
-- MacOS: the similar path like `/Applications/JetBrains Toolbox.app/Contents/MacOS/jetbrains-toolbox`.
+- MacOS: something like `/Applications/JetBrains Toolbox.app/Contents/MacOS/jetbrains-toolbox`.
 - Windows: the path to the `.exe` file.
 
 ```kotlin
