@@ -5,8 +5,9 @@ import com.sun.jna.platform.win32.WinReg
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-internal class PlatformAutoLaunchWindows(private val config: AutoLaunchConfig) :
-    PlatformAutoLaunch {
+internal class PlatformAutoLaunchWindows(
+    private val config: AutoLaunchConfig
+) : PlatformAutoLaunch {
     override suspend fun isEnabled(): Boolean = withContext(Dispatchers.IO) {
         val value: String? = Advapi32Util.registryGetStringValue(
             WinReg.HKEY_CURRENT_USER,
