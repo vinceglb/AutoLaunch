@@ -28,22 +28,17 @@ dependencies {
 
 ## 🚀 Quick start
 
-Create AutoLauch instance by passing your application package name.
+
 
 ```kotlin
+// Create AutoLauch instance by passing your application package name.
 val autoLaunch = AutoLaunch(appPackageName = "com.autolaunch.sample")
-```
 
-Enable or disable auto launch on system startup.
-
-```kotlin
+// Enable or disable auto launch on system startup.
 autoLaunch.enable()
 autoLaunch.disable()
-```
 
-Check if auto launch is enabled.
-
-```kotlin
+// Check if auto launch is enabled.
 val isEnabled = autoLaunch.isEnabled()
 ```
 
