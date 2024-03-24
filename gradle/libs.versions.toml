@@ -1,9 +1,9 @@
 [versions]
-compose-plugin = "1.6.0"
+compose-plugin = "1.6.1"
 kermit = "2.0.3"
 kotlin = "2.0.0-Beta4"
 kotlin-coroutines = "1.8.0"
-mavenPublishVanniktech = "0.27.0"
+mavenPublishVanniktech = "0.28.0"
 jna = "5.14.0"
 
 [libraries]
