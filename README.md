@@ -4,7 +4,7 @@
   <br>
   
   <h1>AutoLaunch Kotlin</h1>
-  <p>Launch your Kotlin Desktop / JVM app automatically on system startup.</p>
+  <p>Lightweight Kotlin library to enable auto-launch on system startup.</p>
 
   <div>
     <img src="https://img.shields.io/maven-central/v/io.github.vinceglb/auto-launch" alt="AutoLaunch Maven Version" />
@@ -13,6 +13,8 @@
 </div>
 
 ## 📦 Installation
+
+AutoLaunch targets JVM platform.
 
 ```kotlin
 repositories {
@@ -24,7 +26,7 @@ dependencies {
 }
 ```
 
-## 🧑‍💻 Usage
+## 🚀 Quick start
 
 Create AutoLauch instance by passing your application package name.
 
@@ -32,5 +34,57 @@ Create AutoLauch instance by passing your application package name.
 val autoLaunch = AutoLaunch(appPackageName = "com.autolaunch.sample")
 ```
 
-## Behind the scene
+Enable or disable auto launch on system startup.
 
+```kotlin
+autoLaunch.enable()
+autoLaunch.disable()
+```
+
+Check if auto launch is enabled.
+
+```kotlin
+val isEnabled = autoLaunch.isEnabled()
+```
+
+> ℹ️ **Note**: To test the auto-launch feature, your application must be distributed. With Compose Multiplatform, you can run a distributable package using `./gradlew :runDistributable`
+
+## 📖 Advanced
+
+By default, your application path is detected automatically. But you can customize the application path that will be launched at startup:
+- MacOS: the similar path like `/Applications/JetBrains Toolbox.app/Contents/MacOS/jetbrains-toolbox`.
+- Windows: the path to the `.exe` file.
+
+```kotlin
+val autoLaunch = AutoLaunch(
+    appPackageName = "com.autolaunch.sample",
+    appPath = "/path/to/your/app"
+)
+```
+
+## ✨ Behind the scene
+
+Depending on the platform, AutoLaunch uses the following techniques:
+
+- MacOS: create a plist file in `~/Library/LaunchAgents/` directory.
+- Windows: create a registry key in `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run`.
+- Linux: to be implemented 🚧
+
+## 🌱 Sample project
+
+You can find a sample project in the `sample` directory. Run the following command to test the auto-launch feature:
+
+```shell
+:sample:runDistributable
+``` 
+
+## 😎 Contribution
+
+Your contributions are welcome 🔥 Here are some features that are missing:
+
+- [ ] Linux support
+- [ ] Pass optional arguments to the application
+
+---
+
+Made with ❤️ by Vince
