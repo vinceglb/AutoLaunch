@@ -44,9 +44,7 @@ val isEnabled = autoLaunch.isEnabled()
 
 ## 📖 Advanced
 
-### ⚡️ Convenience methods
-
-Here are convenient methods:
+### ⚡️ Convenient methods
 
 ```kotlin
 // Get the app resolved executable path
