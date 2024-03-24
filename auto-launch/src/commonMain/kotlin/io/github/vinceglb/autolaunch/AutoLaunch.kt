@@ -36,7 +36,7 @@ class AutoLaunch(
             PlatformUtil.resolvedExecutable
 
         /**
-         * Check if the app is distributable or not
+         * Determine whether the app is distributable
          */
         val isRunningFromDistributable: Boolean =
             PlatformUtil.isRunningFromDistributable
