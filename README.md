@@ -28,13 +28,11 @@ dependencies {
 
 ## 🚀 Quick start
 
-
-
 ```kotlin
-// Create AutoLauch instance by passing your application package name.
+// Create an instance of AutoLaunch.
 val autoLaunch = AutoLaunch(appPackageName = "com.autolaunch.sample")
 
-// Enable or disable auto launch on system startup.
+// Enable or disable launch at startup.
 autoLaunch.enable()
 autoLaunch.disable()
 
@@ -46,7 +44,21 @@ val isEnabled = autoLaunch.isEnabled()
 
 ## 📖 Advanced
 
-By default, your application path is detected automatically. But you can customize the application path that will be launched at startup:
+### ⚡️ Convenience methods
+
+Here are convenient methods:
+
+```kotlin
+// Get the app resolved executable path
+val appPath = AutoLaunch.resolvedExecutable
+
+// Determine whether the app is distributable
+val isDistributable = AutoLaunch.isRunningFromDistributable
+```
+
+### 🔧 Customizing the application path
+
+By default, your application path is detected automatically. You can customize the application path that will be launched at startup:
 - MacOS: the similar path like `/Applications/JetBrains Toolbox.app/Contents/MacOS/jetbrains-toolbox`.
 - Windows: the path to the `.exe` file.
 
