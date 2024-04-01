@@ -10,6 +10,6 @@ updates:
     schedule:
       interval: "weekly"
     reviewers:
-        - "vinceglb"
-      assignees:
-        - "vinceglb"
+      - "vinceglb"
+    assignees:
+      - "vinceglb"
