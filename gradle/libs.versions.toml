@@ -1,5 +1,5 @@
 [versions]
-compose-plugin = "1.6.1"
+compose-plugin = "1.6.2"
 kermit = "2.0.3"
 kotlin = "2.0.0-Beta4"
 kotlin-coroutines = "1.8.0"
