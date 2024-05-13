@@ -2,7 +2,7 @@
 compose-plugin = "1.6.2"
 kermit = "2.0.3"
 kotlin = "2.0.0-RC1"
-kotlin-coroutines = "1.8.0"
+kotlin-coroutines = "1.8.1"
 mavenPublishVanniktech = "0.28.0"
 jna = "5.14.0"
 
