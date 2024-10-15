@@ -28,6 +28,24 @@ class AutoLaunch(
      */
     suspend fun disable() = platformAutoLaunch.disable()
 
+
+    /**
+     * Checks if the application was started with the '--autostart=true' argument.
+     *
+     * This method inspects the JVM input arguments to determine if the application
+     * was launched through the autostart mechanism, by verifying if the specific
+     * argument is present.
+     *
+     * @return true if the application was started with the '--autostart=true' argument, false otherwise.
+     */
+    fun isStartedViaAutostart(): Boolean {
+        val inputArguments = System.getProperty("sun.java.command")?.split(" ") ?: emptyList()
+        println("Arguments fournis: $inputArguments")
+        return inputArguments.contains("--autostart=true")
+    }
+
+
+
     companion object {
         /**
          * Get the app resolved executable path

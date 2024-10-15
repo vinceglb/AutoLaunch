@@ -24,6 +24,7 @@ internal class PlatformAutoLaunchMacOS(private val config: AutoLaunchConfig) : P
             |    <key>ProgramArguments</key>
             |    <array>
             |        <string>${config.appPath}</string>
+            |        <string>--autostart=true</string>
             |    </array>
             |    <key>RunAtLoad</key>
             |    <true/>
@@ -36,4 +37,5 @@ internal class PlatformAutoLaunchMacOS(private val config: AutoLaunchConfig) : P
     override suspend fun disable(): Unit = withContext(Dispatchers.IO) {
         file.delete()
     }
+
 }

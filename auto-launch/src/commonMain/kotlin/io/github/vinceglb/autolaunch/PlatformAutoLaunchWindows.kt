@@ -14,7 +14,7 @@ internal class PlatformAutoLaunchWindows(
             REGISTRY_KEY,
             config.appPackageName
         )
-        value == config.appPath
+        value == "${config.appPath} --autostart=true"
     }
 
     override suspend fun enable(): Unit = withContext(Dispatchers.IO) {
@@ -23,12 +23,12 @@ internal class PlatformAutoLaunchWindows(
             Advapi32Util.registryCreateKey(WinReg.HKEY_CURRENT_USER, REGISTRY_KEY)
         }
 
-        // Set the value
+        // Set the value with the autostart argument
         Advapi32Util.registrySetStringValue(
             WinReg.HKEY_CURRENT_USER,
             REGISTRY_KEY,
             config.appPackageName,
-            config.appPath
+            "${config.appPath} --autostart=true"
         )
     }
 

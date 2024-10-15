@@ -31,6 +31,7 @@ internal class PlatformAutoLaunchLinux(private val config: AutoLaunchConfig) : P
     // Modifies the content of the .desktop file to add necessary entries for autostart
     private fun modifyDesktopFileContent(content: String): String {
         val updatedContent = content.lines().toMutableList()
+
         // Ensure the file contains the necessary entries for autostart
         val entries = listOf(
             "X-GNOME-Autostart-enabled=true",
@@ -52,8 +53,23 @@ internal class PlatformAutoLaunchLinux(private val config: AutoLaunchConfig) : P
             }
         }
 
+        // Add --autostart=true to the Exec line
+        val execIndex = updatedContent.indexOfFirst { it.startsWith("Exec=") }
+        if (execIndex != -1) {
+            val execLine = updatedContent[execIndex]
+            if (!execLine.contains("--autostart=true")) {
+                println("Adding --autostart=true to the Exec line")
+                updatedContent[execIndex] = "$execLine --autostart=true"
+            }
+        } else {
+            // If Exec line does not exist, create a new one
+            println("Adding new Exec line with --autostart=true")
+            updatedContent.add("Exec=${config.appPath} --autostart=true")
+        }
+
         return updatedContent.joinToString("\n")
     }
+
 
     // Writes the modified .desktop file to the ~/.config/autostart directory
     private fun writeAutostartDesktopFile(content: String) {
@@ -102,6 +118,7 @@ internal class PlatformAutoLaunchLinux(private val config: AutoLaunchConfig) : P
             println("Autostart desktop file not found at: ${autostartFile.path}")
         }
     }
+
 }
 
 /*
