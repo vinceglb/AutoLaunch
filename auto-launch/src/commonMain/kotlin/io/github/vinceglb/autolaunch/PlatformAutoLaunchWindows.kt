@@ -20,7 +20,7 @@ internal class PlatformAutoLaunchWindows(
             )
             value == "${config.appPath} --autostart=true"
         } catch (e: Win32Exception) {
-            if (e.message?.contains("Le fichier spécifié est introuvable") == true) {
+            if (e.errorCode == 2) { // ERROR_FILE_NOT_FOUND
                 false
             } else {
                 throw e
@@ -32,7 +32,7 @@ internal class PlatformAutoLaunchWindows(
         // Check if the application path exists
         val appPath = File(config.appPath)
         if (!appPath.exists()) {
-            throw FileNotFoundException("Le fichier spécifié est introuvable: ${config.appPath}")
+            throw FileNotFoundException("File not found: ${config.appPath}")
         }
 
         // Create the registry key if it doesn't exist
