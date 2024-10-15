@@ -12,7 +12,7 @@ internal class PlatformAutoLaunchWindows(
         val value: String? = Advapi32Util.registryGetStringValue(
             WinReg.HKEY_CURRENT_USER,
             REGISTRY_KEY,
-            config.appName
+            config.appPackageName
         )
         value == config.appPath
     }
@@ -27,7 +27,7 @@ internal class PlatformAutoLaunchWindows(
         Advapi32Util.registrySetStringValue(
             WinReg.HKEY_CURRENT_USER,
             REGISTRY_KEY,
-            config.appName,
+            config.appPackageName,
             config.appPath
         )
     }
@@ -37,7 +37,7 @@ internal class PlatformAutoLaunchWindows(
             Advapi32Util.registryDeleteValue(
                 WinReg.HKEY_CURRENT_USER,
                 REGISTRY_KEY,
-                config.appName
+                config.appPackageName
             )
         }
     }

@@ -7,6 +7,6 @@ internal interface PlatformAutoLaunch {
 }
 
 internal data class AutoLaunchConfig(
-    val appName: String,
+    val appPackageName: String,
     val appPath: String,
 )

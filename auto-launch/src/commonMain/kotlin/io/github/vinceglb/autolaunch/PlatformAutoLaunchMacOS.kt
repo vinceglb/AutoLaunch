@@ -6,7 +6,7 @@ import java.io.File
 
 internal class PlatformAutoLaunchMacOS(private val config: AutoLaunchConfig) : PlatformAutoLaunch {
     private val file =
-        File("${System.getProperty("user.home")}/Library/LaunchAgents/${config.appName}.plist")
+        File("${System.getProperty("user.home")}/Library/LaunchAgents/${config.appPackageName}.plist")
 
     override suspend fun isEnabled(): Boolean = withContext(Dispatchers.IO) {
         file.exists()
@@ -20,7 +20,7 @@ internal class PlatformAutoLaunchMacOS(private val config: AutoLaunchConfig) : P
             |<plist version="1.0">
             |<dict>
             |    <key>Label</key>
-            |    <string>${config.appName}</string>
+            |    <string>${config.appPackageName}</string>
             |    <key>ProgramArguments</key>
             |    <array>
             |        <string>${config.appPath}</string>
