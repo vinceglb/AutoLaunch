@@ -43,7 +43,7 @@ class AutoLaunch(
     }
 
     private val config = AutoLaunchConfig(
-        appName = appPackageName,
+        appPackageName = appPackageName,
         appPath = appPath
     )
 
