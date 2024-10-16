@@ -2,6 +2,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -63,7 +64,10 @@ fun App() {
                     color = MaterialTheme.colorScheme.error,
                 )
             } else {
-                Text(text = "App resolved executable path:", modifier = Modifier.padding(bottom = 2.dp))
+                Text(
+                    text = "App resolved executable path:",
+                    modifier = Modifier.padding(bottom = 2.dp)
+                )
                 TextButton(onClick = { copyToClipboard(AutoLaunch.resolvedExecutable.path) }) {
                     Text(
                         text = AutoLaunch.resolvedExecutable.path,
