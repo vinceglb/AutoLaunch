@@ -87,7 +87,7 @@ You can find a sample project in the `sample` directory. Run the following comma
 
 Your contributions are welcome 🔥 Here are some features that are missing:
 
-- [ ] Linux support
+- [x] Linux support
 - [ ] Pass optional arguments to the application
 
 ---
