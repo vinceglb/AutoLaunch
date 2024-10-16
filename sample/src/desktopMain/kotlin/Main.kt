@@ -36,6 +36,8 @@ fun App() {
     val scope = rememberCoroutineScope()
     val autoLaunch = remember { AutoLaunch(appPackageName = "com.autolaunch.sample") }
     var isEnabled by remember { mutableStateOf(false) }
+    val isStartedViaAutostart = autoLaunch.isStartedViaAutostart()
+
 
     LaunchedEffect(Unit) {
         isEnabled = autoLaunch.isEnabled()
@@ -56,6 +58,15 @@ fun App() {
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
+
+
+            Text(
+                text = "The application was ${if (!isStartedViaAutostart) "not" else ""} started via autostart.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
 
             if (!AutoLaunch.isRunningFromDistributable) {
                 Text(
