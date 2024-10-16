@@ -22,7 +22,7 @@ repositories {
 }
 
 dependencies {
-    implementation("io.github.vinceglb:auto-launch:0.1.0")
+    implementation("io.github.vinceglb:auto-launch:0.3.0")
 }
 ```
 
@@ -73,7 +73,7 @@ Depending on the platform, AutoLaunch uses the following techniques:
 
 - MacOS: create a plist file in `~/Library/LaunchAgents/` directory.
 - Windows: create a registry key in `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run`.
-- Linux: to be implemented 🚧
+- Linux: create a `.desktop` file in `~/.config/autostart/` directory.
 
 ## 🌱 Sample project
 
