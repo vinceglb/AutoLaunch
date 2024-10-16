@@ -38,6 +38,9 @@ autoLaunch.disable()
 
 // Check if auto launch is enabled.
 val isEnabled = autoLaunch.isEnabled()
+
+// Check if the app was started by autostart.
+val isStartedViaAutostart = autoLaunch.isStartedViaAutostart()
 ```
 
 > ℹ️ **Note**: To test the auto-launch feature, your application must be distributed. With Compose Multiplatform, you can run a distributable package using `./gradlew :runDistributable`
