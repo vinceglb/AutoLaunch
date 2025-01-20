@@ -1,12 +1,8 @@
 package io.github.vinceglb.autolaunch
 
-import com.sun.jna.platform.win32.Advapi32Util
-import com.sun.jna.platform.win32.Win32Exception
-import com.sun.jna.platform.win32.WinReg
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import java.io.File
-import java.io.FileNotFoundException
+import com.sun.jna.platform.win32.*
+import kotlinx.coroutines.*
+import kotlin.io.path.*
 
 internal class PlatformAutoLaunchWindows(
     private val config: AutoLaunchConfig
@@ -30,9 +26,9 @@ internal class PlatformAutoLaunchWindows(
 
     override suspend fun enable(): Unit = withContext(Dispatchers.IO) {
         // Check if the application path exists
-        val appPath = File(config.appPath)
-        if (!appPath.exists()) {
-            throw FileNotFoundException("File not found: ${config.appPath}")
+        val appPath = Path(config.appPath)
+        if (appPath.notExists()) {
+            throw NoSuchFileException(appPath.toFile())
         }
 
         // Create the registry key if it doesn't exist

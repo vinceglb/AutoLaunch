@@ -1,12 +1,11 @@
 package io.github.vinceglb.autolaunch
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import java.io.File
+import kotlinx.coroutines.*
+import kotlin.io.path.*
 
 internal class PlatformAutoLaunchMacOS(private val config: AutoLaunchConfig) : PlatformAutoLaunch {
     private val file =
-        File("${System.getProperty("user.home")}/Library/LaunchAgents/${config.appPackageName}.plist")
+        Path("${System.getProperty("user.home")}/Library/LaunchAgents/${config.appPackageName}.plist")
 
     override suspend fun isEnabled(): Boolean = withContext(Dispatchers.IO) {
         file.exists()
@@ -35,7 +34,6 @@ internal class PlatformAutoLaunchMacOS(private val config: AutoLaunchConfig) : P
     }
 
     override suspend fun disable(): Unit = withContext(Dispatchers.IO) {
-        file.delete()
+        file.deleteIfExists()
     }
-
 }

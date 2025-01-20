@@ -1,11 +1,11 @@
 package io.github.vinceglb.autolaunch
 
 import co.touchlab.kermit.Logger
-import java.io.File
+import kotlin.io.path.absolutePathString
 
 class AutoLaunch(
     appPackageName: String,
-    appPath: String = PlatformUtil.resolvedExecutable.absolutePath,
+    appPath: String = PlatformUtil.resolvedExecutable.absolutePathString(),
 ) {
     /**
      * Check if the app is set to auto launch
@@ -50,7 +50,7 @@ class AutoLaunch(
         /**
          * Get the app resolved executable path
          */
-        val resolvedExecutable: File =
+        val resolvedExecutable =
             PlatformUtil.resolvedExecutable
 
         /**

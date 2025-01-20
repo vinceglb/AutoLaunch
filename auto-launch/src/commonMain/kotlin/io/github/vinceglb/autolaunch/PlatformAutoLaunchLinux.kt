@@ -1,15 +1,20 @@
 package io.github.vinceglb.autolaunch
 
-import java.io.File
+import kotlin.io.path.*
 
 internal class PlatformAutoLaunchLinux(private val config: AutoLaunchConfig) : PlatformAutoLaunch {
 
-    // Checks if the application is installed by looking for a corresponding .desktop file in /usr/share/applications
+    // Checks if the application is installed by looking for a corresponding .desktop file in /usr/share/applications and /opt
     private fun isInstalled(): Boolean {
         val appPackageName = config.appPackageName
-        val applicationsDirectory = File("/usr/share/applications")
-        val desktopFile = applicationsDirectory.listFiles()?.find { it.name.contains(appPackageName) && it.name.endsWith(".desktop") }
-        val isInstalled = desktopFile != null
+        val applicationsDirectory = Path("/usr/share/applications")
+        // The path will be lowercase and without spaces regarding JPackage
+        val desktopFile = applicationsDirectory.listDirectoryEntries().find { it.name.endsWith(appPackageName.replace(" ", "_")) && it.name.endsWith(".desktop") }
+
+        // Check if the app is installed in /opt. The path will be lowercase and without spaces regarding JPackage
+        val optFile = Path("/opt").listDirectoryEntries().find { it.name.equals(other = appPackageName.replace(" ", "-"), ignoreCase = true) }
+
+        val isInstalled = desktopFile != null || optFile != null
         println("Checking if app is installed: $isInstalled (package: $appPackageName)")
         return isInstalled
     }
@@ -17,10 +22,10 @@ internal class PlatformAutoLaunchLinux(private val config: AutoLaunchConfig) : P
     // Retrieves the content of the application's .desktop file from /usr/share/applications
     private fun getDesktopFileContent(): String? {
         val appPackageName = config.appPackageName
-        val applicationsDirectory = File("/usr/share/applications")
-        val desktopFile = applicationsDirectory.listFiles()?.find { it.name.contains(appPackageName) && it.name.endsWith(".desktop") }
+        val applicationsDirectory = Path("/usr/share/applications")
+        val desktopFile = applicationsDirectory.listDirectoryEntries().find { it.name.endsWith("${appPackageName.replace(" ", "_")}.desktop") }
         return if (desktopFile != null && desktopFile.exists()) {
-            println("Reading desktop file content from: ${desktopFile.path}")
+            println("Reading desktop file content from: $desktopFile")
             desktopFile.readText()
         } else {
             println("Desktop file not found for package: $appPackageName")
@@ -73,21 +78,106 @@ internal class PlatformAutoLaunchLinux(private val config: AutoLaunchConfig) : P
 
     // Writes the modified .desktop file to the ~/.config/autostart directory
     private fun writeAutostartDesktopFile(content: String) {
-        val autostartDirectory = File(System.getProperty("user.home"), ".config/autostart")
+        val autostartDirectory = Path(System.getProperty("user.home"), ".config/autostart")
         if (!autostartDirectory.exists()) {
-            println("Creating autostart directory at: ${autostartDirectory.path}")
-            autostartDirectory.mkdirs()
+            println("Creating autostart directory at: $autostartDirectory")
+            autostartDirectory.createDirectories()
         }
-        val autostartFile = File(autostartDirectory, "${config.appPackageName}.desktop")
-        println("Writing autostart desktop file to: ${autostartFile.path}")
+        val autostartFile = autostartDirectory.resolve("${config.appPackageName}.desktop")
+        println("Writing autostart desktop file to: $autostartFile")
         autostartFile.writeText(content)
+    }
+
+    // Writes a systemd service file to enable autostart
+    private fun writeSystemdService() {
+        val appPackageName = config.appPackageName
+        val appPath = appPackageName.replace(" ", "-").lowercase()
+        val servicePath = Path(System.getProperty("user.home"))
+            .resolve(".config/systemd/user/$appPath.service")
+        val serviceContent = """
+            [Unit]
+            Description=$appPackageName
+            After=network.target
+
+            [Service]
+            Restart=on-failure
+            User=${System.getProperty("user.name")}
+            ExecStart=/opt/$appPath/bin/'$appPackageName'
+
+            [Install]
+            WantedBy=default.target
+        """.trimIndent()
+        if (servicePath.exists()) {
+            println("Service $appPath already exists at $servicePath")
+
+            if (servicePath.readText() == serviceContent) {
+                println("Service $appPath is already up to date")
+                return
+            }
+            servicePath.deleteExisting()
+        }
+        try {
+            if (!servicePath.exists()) {
+                try {
+                    servicePath.createParentDirectories()
+                    servicePath.createFile()
+                } catch (_: FileAlreadyExistsException) {
+                    // Ignore
+                }
+                servicePath.writeText(serviceContent)
+            }
+            enableSystemdService(appPath)
+            println("Service $servicePath has been updated")
+        } catch (e: Exception) {
+            println("Failed to enable auto start as systemd service: $e")
+        }
+    }
+
+    // Enables the systemd service to start the application on boot
+    private fun enableSystemdService(appPath: String) {
+        ProcessBuilder("systemctl", "--user", "daemon-reload")
+            .inheritIO()
+            .start()
+            .waitFor()
+        ProcessBuilder("systemctl", "--user", "enable", "$appPath.service")
+            .inheritIO()
+            .start()
+            .waitFor()
+        ProcessBuilder("systemctl", "--user", "start", "$appPath.service")
+            .inheritIO()
+            .start()
+            .waitFor()
+    }
+
+    // Disables the systemd service
+    private fun disableSystemdService(appPath: String) {
+        ProcessBuilder("systemctl", "--user", "disable", "$appPath.service")
+            .inheritIO()
+            .start()
+            .waitFor()
+        ProcessBuilder("systemctl", "--user", "stop", "$appPath.service")
+            .inheritIO()
+            .start()
+            .waitFor()
     }
 
     // Checks if autostart is enabled by looking for the .desktop file in ~/.config/autostart
     override suspend fun isEnabled(): Boolean {
-        val autostartFile = File(System.getProperty("user.home"), ".config/autostart/${config.appPackageName}.desktop")
-        val isEnabled = autostartFile.exists()
-        println("Checking if autostart is enabled: $isEnabled (path: ${autostartFile.path})")
+        val appPackageName = config.appPackageName
+        val autostartFile = Path(System.getProperty("user.home"), ".config/autostart/$appPackageName.desktop")
+        val isEnabledDesktop = autostartFile.exists()
+        println("Checking if autostart is enabled: $isEnabledDesktop (path: $autostartFile)")
+
+        val appPath = appPackageName.replace(" ", "-").lowercase()
+        val statusProcess = ProcessBuilder("systemctl", "--user", "status", "$appPath.service")
+            .redirectErrorStream(true)
+            .start()
+        val statusOutput = statusProcess.inputStream.bufferedReader().readText()
+        statusProcess.waitFor()
+        val isEnabledSystemd = statusOutput.contains("Active: active (running)")
+        println("Checking if systemd is enabled: $isEnabledSystemd (path: $appPath.service)")
+
+        val isEnabled = isEnabledDesktop || isEnabledSystemd
         return isEnabled
     }
 
@@ -100,7 +190,8 @@ internal class PlatformAutoLaunchLinux(private val config: AutoLaunchConfig) : P
                 val modifiedContent = modifyDesktopFileContent(desktopFileContent)
                 writeAutostartDesktopFile(modifiedContent)
             } else {
-                println("Failed to enable autostart: desktop file content is null")
+                println("Desktop file content is null. Trying to enable autostart via systemd service.")
+                writeSystemdService()
             }
         } else {
             println("Failed to enable autostart: app is not installed")
@@ -109,20 +200,16 @@ internal class PlatformAutoLaunchLinux(private val config: AutoLaunchConfig) : P
 
     // Disables autostart by deleting the .desktop file in ~/.config/autostart
     override suspend fun disable() {
-        println("Disabling autostart for app: ${config.appPackageName}")
-        val autostartFile = File(System.getProperty("user.home"), ".config/autostart/${config.appPackageName}.desktop")
+        val appPackageName = config.appPackageName
+        println("Disabling autostart for app: $appPackageName")
+        val autostartFile = Path(System.getProperty("user.home"), ".config/autostart/$appPackageName.desktop")
         if (autostartFile.exists()) {
-            println("Deleting autostart desktop file at: ${autostartFile.path}")
-            autostartFile.delete()
+            println("Deleting autostart desktop file at: $autostartFile")
+            autostartFile.deleteIfExists()
         } else {
-            println("Autostart desktop file not found at: ${autostartFile.path}")
+            println("Autostart desktop file not found at: $autostartFile")
+            println("Disabling systemd for app: $appPackageName")
+            disableSystemdService(appPackageName.replace(" ", "-").lowercase())
         }
     }
-
 }
-
-/*
-To test this functionality, it is necessary to create a .deb package and install it on the system.
-Without installation via a .deb, no .desktop file will be automatically created in /usr/share/applications,
-which makes it impossible to verify the presence of the application and enable autostart.
-*/

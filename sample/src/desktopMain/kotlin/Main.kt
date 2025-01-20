@@ -1,29 +1,15 @@
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.application
+import androidx.compose.ui.window.*
 import io.github.vinceglb.autolaunch.AutoLaunch
 import kotlinx.coroutines.launch
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
+import kotlin.io.path.absolutePathString
 
 fun main() = application {
     Window(onCloseRequest = ::exitApplication, title = "AutoLaunch Sample") {
@@ -79,9 +65,9 @@ fun App() {
                     text = "App resolved executable path:",
                     modifier = Modifier.padding(bottom = 2.dp)
                 )
-                TextButton(onClick = { copyToClipboard(AutoLaunch.resolvedExecutable.path) }) {
+                TextButton(onClick = { copyToClipboard(AutoLaunch.resolvedExecutable.absolutePathString()) }) {
                     Text(
-                        text = AutoLaunch.resolvedExecutable.path,
+                        text = AutoLaunch.resolvedExecutable.absolutePathString(),
                         textAlign = TextAlign.Center,
                     )
                 }
