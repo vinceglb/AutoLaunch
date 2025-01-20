@@ -1,10 +1,10 @@
 package io.github.vinceglb.autolaunch
 
-import java.io.File
+import kotlin.io.path.*
 
 internal object PlatformUtil {
-    val resolvedExecutable: File =
-        File(ProcessHandle.current().info().command().get())
+    val resolvedExecutable =
+        Path(ProcessHandle.current().info().command().get())
 
     val isRunningFromDistributable: Boolean =
         resolvedExecutable.nameWithoutExtension != "java"
