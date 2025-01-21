@@ -3,16 +3,20 @@ package io.github.vinceglb.autolaunch
 import kotlin.io.path.*
 
 internal class PlatformAutoLaunchLinux(private val config: AutoLaunchConfig) : PlatformAutoLaunch {
-
-    // Checks if the application is installed by looking for a corresponding .desktop file in /usr/share/applications and /opt
+    // Checks if the application is installed
+    // by looking for a corresponding .desktop file in /usr/share/applications and /opt
     private fun isInstalled(): Boolean {
         val appPackageName = config.appPackageName
         val applicationsDirectory = Path("/usr/share/applications")
         // The path will be lowercase and without spaces regarding JPackage
-        val desktopFile = applicationsDirectory.listDirectoryEntries().find { it.name.endsWith(appPackageName.replace(" ", "_")) && it.name.endsWith(".desktop") }
+        val desktopFile = applicationsDirectory.listDirectoryEntries().find {
+            it.name.endsWith("${appPackageName.replace(" ", "_")}.desktop")
+        }
 
         // Check if the app is installed in /opt. The path will be lowercase and without spaces regarding JPackage
-        val optFile = Path("/opt").listDirectoryEntries().find { it.name.equals(other = appPackageName.replace(" ", "-"), ignoreCase = true) }
+        val optFile = Path("/opt").listDirectoryEntries().find {
+            it.name.equals(other = appPackageName.replace(" ", "-"), ignoreCase = true)
+        }
 
         val isInstalled = desktopFile != null || optFile != null
         println("Checking if app is installed: $isInstalled (package: $appPackageName)")
@@ -23,7 +27,9 @@ internal class PlatformAutoLaunchLinux(private val config: AutoLaunchConfig) : P
     private fun getDesktopFileContent(): String? {
         val appPackageName = config.appPackageName
         val applicationsDirectory = Path("/usr/share/applications")
-        val desktopFile = applicationsDirectory.listDirectoryEntries().find { it.name.endsWith("${appPackageName.replace(" ", "_")}.desktop") }
+        val desktopFile = applicationsDirectory.listDirectoryEntries().find {
+            it.name.endsWith("${appPackageName.replace(" ", "_")}.desktop")
+        }
         return if (desktopFile != null && desktopFile.exists()) {
             println("Reading desktop file content from: $desktopFile")
             desktopFile.readText()
@@ -95,18 +101,18 @@ internal class PlatformAutoLaunchLinux(private val config: AutoLaunchConfig) : P
         val servicePath = Path(System.getProperty("user.home"))
             .resolve(".config/systemd/user/$appPath.service")
         val serviceContent = """
-            [Unit]
-            Description=$appPackageName
-            After=network.target
-
-            [Service]
-            Restart=on-failure
-            User=${System.getProperty("user.name")}
-            ExecStart=/opt/$appPath/bin/'$appPackageName'
-
-            [Install]
-            WantedBy=default.target
-        """.trimIndent()
+            |[Unit]
+            |Description=$appPackageName
+            |After=network.target
+            |
+            |[Service]
+            |Restart=on-failure
+            |User=${System.getProperty("user.name")}
+            |ExecStart=/opt/$appPath/bin/'$appPackageName'
+            |
+            |[Install]
+            |WantedBy=default.target
+        """.trimMargin()
         if (servicePath.exists()) {
             println("Service $appPath already exists at $servicePath")
 

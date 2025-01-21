@@ -10,20 +10,11 @@ internal object PlatformUtil {
         resolvedExecutable.nameWithoutExtension != "java"
 
     val currentPlatform: Platform
-        get() {
-            val system = System.getProperty("os.name").lowercase()
-            return if (system.contains("win")) {
-                Platform.Windows
-            } else if (
-                system.contains("nix") ||
-                system.contains("nux") ||
-                system.contains("aix")
-            ) {
-                Platform.Linux
-            } else if (system.contains("mac")) {
-                Platform.MacOS
-            } else {
-                Platform.Linux
+        get() = System.getProperty("os.name").lowercase().let { system ->
+            when {
+                system.contains("win") -> Platform.Windows
+                system.contains("mac") -> Platform.MacOS
+                else -> Platform.Linux
             }
         }
 }
