@@ -107,7 +107,6 @@ internal class PlatformAutoLaunchLinux(private val config: AutoLaunchConfig) : P
             |
             |[Service]
             |Restart=on-failure
-            |User=${System.getProperty("user.name")}
             |ExecStart=/opt/$appPath/bin/'$appPackageName'
             |
             |[Install]
@@ -149,7 +148,7 @@ internal class PlatformAutoLaunchLinux(private val config: AutoLaunchConfig) : P
             .inheritIO()
             .start()
             .waitFor()
-        ProcessBuilder("systemctl", "--user", "start", "$appPath.service")
+        ProcessBuilder("systemctl", "--user", "restart", "$appPath.service")
             .inheritIO()
             .start()
             .waitFor()
