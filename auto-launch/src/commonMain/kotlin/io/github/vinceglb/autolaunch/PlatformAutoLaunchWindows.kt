@@ -10,9 +10,9 @@ internal class PlatformAutoLaunchWindows(
     override suspend fun isEnabled(): Boolean = withContext(Dispatchers.IO) {
         try {
             val value: String? = Advapi32Util.registryGetStringValue(
-                WinReg.HKEY_CURRENT_USER,
-                REGISTRY_KEY,
-                config.appPackageName
+                /* root = */ WinReg.HKEY_CURRENT_USER,
+                /* key = */ REGISTRY_KEY,
+                /* value = */ config.appPackageName
             )
             value == "${config.appPath} --autostart=true"
         } catch (e: Win32Exception) {
@@ -33,31 +33,36 @@ internal class PlatformAutoLaunchWindows(
 
         // Create the registry key if it doesn't exist
         if (!isRegistryKeyExists()) {
-            Advapi32Util.registryCreateKey(WinReg.HKEY_CURRENT_USER, REGISTRY_KEY)
+            Advapi32Util.registryCreateKey(
+                /* hKey = */ WinReg.HKEY_CURRENT_USER,
+                /* keyName = */ REGISTRY_KEY
+            )
         }
 
         // Set the value with the autostart argument
         Advapi32Util.registrySetStringValue(
-            WinReg.HKEY_CURRENT_USER,
-            REGISTRY_KEY,
-            config.appPackageName,
-            "${config.appPath} --autostart=true"
+            /* root = */ WinReg.HKEY_CURRENT_USER,
+            /* keyPath = */ REGISTRY_KEY,
+            /* name = */ config.appPackageName,
+            /* value = */ "${config.appPath} --autostart=true"
         )
     }
 
     override suspend fun disable(): Unit = withContext(Dispatchers.IO) {
         if (isRegistryKeyExists()) {
             Advapi32Util.registryDeleteValue(
-                WinReg.HKEY_CURRENT_USER,
-                REGISTRY_KEY,
-                config.appPackageName
+                /* root = */ WinReg.HKEY_CURRENT_USER,
+                /* keyPath = */ REGISTRY_KEY,
+                /* valueName = */ config.appPackageName
             )
         }
     }
 
-    private fun isRegistryKeyExists(): Boolean {
-        return Advapi32Util.registryKeyExists(WinReg.HKEY_CURRENT_USER, REGISTRY_KEY)
-    }
+    private fun isRegistryKeyExists(): Boolean =
+        Advapi32Util.registryKeyExists(
+            /* root = */ WinReg.HKEY_CURRENT_USER,
+            /* key = */ REGISTRY_KEY
+        )
 
     private companion object {
         private const val REGISTRY_KEY = "Software\\Microsoft\\Windows\\CurrentVersion\\Run"

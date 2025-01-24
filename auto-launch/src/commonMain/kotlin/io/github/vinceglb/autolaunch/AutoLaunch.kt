@@ -28,7 +28,6 @@ class AutoLaunch(
      */
     suspend fun disable() = platformAutoLaunch.disable()
 
-
     /**
      * Checks if the application was started with the '--autostart=true' argument.
      *
@@ -43,8 +42,6 @@ class AutoLaunch(
         println("Arguments fournis: $inputArguments")
         return inputArguments.contains("--autostart=true")
     }
-
-
 
     companion object {
         /**
