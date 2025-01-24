@@ -77,6 +77,7 @@ Depending on the platform, AutoLaunch uses the following techniques:
 - MacOS: create a plist file in `~/Library/LaunchAgents/` directory.
 - Windows: create a registry key in `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run`.
 - Linux: create a `.desktop` file in `~/.config/autostart/` directory.
+    If there is no `xdg-desktop-menu` -> systemd will be used to enable a daemon.
 
 ## 🌱 Sample project
 
