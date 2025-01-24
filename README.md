@@ -22,7 +22,7 @@ repositories {
 }
 
 dependencies {
-    implementation("io.github.vinceglb:auto-launch:0.4.0")
+    implementation("io.github.vinceglb:auto-launch:0.5.1")
 }
 ```
 
