@@ -24,7 +24,6 @@ fun App() {
     var isEnabled by remember { mutableStateOf(false) }
     val isStartedViaAutostart = autoLaunch.isStartedViaAutostart()
 
-
     LaunchedEffect(Unit) {
         isEnabled = autoLaunch.isEnabled()
     }
