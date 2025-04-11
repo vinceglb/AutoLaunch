@@ -39,7 +39,7 @@ class AutoLaunch(
      */
     fun isStartedViaAutostart(): Boolean {
         val inputArguments = System.getProperty("sun.java.command")?.split(" ") ?: emptyList()
-        println("Arguments fournis: $inputArguments")
+        logger.d { "Starting via AutoLaunch with inputArguments: $inputArguments" }
         return inputArguments.contains("--autostart=true")
     }
 
