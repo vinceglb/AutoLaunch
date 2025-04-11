@@ -1,8 +1,10 @@
 package io.github.vinceglb.autolaunch
 
+import co.touchlab.kermit.Logger
 import kotlin.io.path.*
 
 internal class PlatformAutoLaunchLinux(private val config: AutoLaunchConfig) : PlatformAutoLaunch {
+    private val logger = Logger.withTag("PlatformAutoLaunchLinux")
     // Checks if the application is installed
     // by looking for a corresponding .desktop file in /usr/share/applications and /opt
     private fun isInstalled(): Boolean {
@@ -19,7 +21,7 @@ internal class PlatformAutoLaunchLinux(private val config: AutoLaunchConfig) : P
         }
 
         val isInstalled = desktopFile != null || optFile != null
-        println("Checking if app is installed: $isInstalled (package: $appPackageName)")
+        logger.d { "Checking if app is installed: $isInstalled (package: $appPackageName)" }
         return isInstalled
     }
 
@@ -31,10 +33,10 @@ internal class PlatformAutoLaunchLinux(private val config: AutoLaunchConfig) : P
             it.name.endsWith("${appPackageName.replace(" ", "_")}.desktop")
         }
         return if (desktopFile != null && desktopFile.exists()) {
-            println("Reading desktop file content from: $desktopFile")
+            logger.d { "Reading desktop file content from: $desktopFile" }
             desktopFile.readText()
         } else {
-            println("Desktop file not found for package: $appPackageName")
+            logger.d { "Desktop file not found for package: $appPackageName" }
             null
         }
     }
@@ -56,10 +58,10 @@ internal class PlatformAutoLaunchLinux(private val config: AutoLaunchConfig) : P
             val key = entry.substringBefore("=")
             val existingIndex = updatedContent.indexOfFirst { it.startsWith(key) }
             if (existingIndex != -1) {
-                println("Updating existing entry: $key")
+                logger.d { "Updating existing entry: $key" }
                 updatedContent[existingIndex] = entry
             } else {
-                println("Adding new entry: $entry")
+                logger.d { "Adding new entry: $entry" }
                 updatedContent.add(entry)
             }
         }
@@ -69,12 +71,12 @@ internal class PlatformAutoLaunchLinux(private val config: AutoLaunchConfig) : P
         if (execIndex != -1) {
             val execLine = updatedContent[execIndex]
             if (!execLine.contains("--autostart=true")) {
-                println("Adding --autostart=true to the Exec line")
+                logger.d { "Adding --autostart=true to the Exec line" }
                 updatedContent[execIndex] = "$execLine --autostart=true"
             }
         } else {
             // If Exec line does not exist, create a new one
-            println("Adding new Exec line with --autostart=true")
+            logger.d { "Adding new Exec line with --autostart=true" }
             updatedContent.add("Exec=${config.appPath} --autostart=true")
         }
 
@@ -86,11 +88,11 @@ internal class PlatformAutoLaunchLinux(private val config: AutoLaunchConfig) : P
     private fun writeAutostartDesktopFile(content: String) {
         val autostartDirectory = Path(System.getProperty("user.home"), ".config/autostart")
         if (!autostartDirectory.exists()) {
-            println("Creating autostart directory at: $autostartDirectory")
+            logger.d { "Creating autostart directory at: $autostartDirectory" }
             autostartDirectory.createDirectories()
         }
         val autostartFile = autostartDirectory.resolve("${config.appPackageName}.desktop")
-        println("Writing autostart desktop file to: $autostartFile")
+        logger.d { "Writing autostart desktop file to: $autostartFile" }
         autostartFile.writeText(content)
     }
 
@@ -113,10 +115,10 @@ internal class PlatformAutoLaunchLinux(private val config: AutoLaunchConfig) : P
             |WantedBy=default.target
         """.trimMargin()
         if (servicePath.exists()) {
-            println("Service $appPath already exists at $servicePath")
+            logger.d { "Service $appPath already exists at $servicePath" }
 
             if (servicePath.readText() == serviceContent) {
-                println("Service $appPath is already up to date")
+                logger.d { "Service $appPath is already up to date" }
                 return
             }
             servicePath.deleteExisting()
@@ -132,9 +134,9 @@ internal class PlatformAutoLaunchLinux(private val config: AutoLaunchConfig) : P
                 servicePath.writeText(serviceContent)
             }
             enableSystemdService(appPath)
-            println("Service $servicePath has been updated")
+            logger.d { "Service $servicePath has been updated" }
         } catch (e: Exception) {
-            println("Failed to enable auto start as systemd service: $e")
+            logger.d { "Failed to enable auto start as systemd service: $e" }
         }
     }
 
@@ -171,7 +173,7 @@ internal class PlatformAutoLaunchLinux(private val config: AutoLaunchConfig) : P
         val appPackageName = config.appPackageName
         val autostartFile = Path(System.getProperty("user.home"), ".config/autostart/$appPackageName.desktop")
         val isEnabledDesktop = autostartFile.exists()
-        println("Checking if autostart is enabled: $isEnabledDesktop (path: $autostartFile)")
+        logger.d { "Checking if autostart is enabled: $isEnabledDesktop (path: $autostartFile)" }
 
         val appPath = appPackageName.replace(" ", "-").lowercase()
         val statusProcess = ProcessBuilder("systemctl", "--user", "status", "$appPath.service")
@@ -180,7 +182,7 @@ internal class PlatformAutoLaunchLinux(private val config: AutoLaunchConfig) : P
         val statusOutput = statusProcess.inputStream.bufferedReader().readText()
         statusProcess.waitFor()
         val isEnabledSystemd = statusOutput.contains("Active: active (running)")
-        println("Checking if systemd is enabled: $isEnabledSystemd (path: $appPath.service)")
+        logger.d {"Checking if systemd is enabled: $isEnabledSystemd (path: $appPath.service)" }
 
         val isEnabled = isEnabledDesktop || isEnabledSystemd
         return isEnabled
@@ -188,32 +190,32 @@ internal class PlatformAutoLaunchLinux(private val config: AutoLaunchConfig) : P
 
     // Enables autostart by copying and modifying the application's .desktop file
     override suspend fun enable() {
-        println("Enabling autostart for app: ${config.appPackageName}")
+        logger.d { "Enabling autostart for app: ${config.appPackageName}" }
         if (isInstalled()) {
             val desktopFileContent = getDesktopFileContent()
             if (desktopFileContent != null) {
                 val modifiedContent = modifyDesktopFileContent(desktopFileContent)
                 writeAutostartDesktopFile(modifiedContent)
             } else {
-                println("Desktop file content is null. Trying to enable autostart via systemd service.")
+                logger.d { "Desktop file content is null. Trying to enable autostart via systemd service." }
                 writeSystemdService()
             }
         } else {
-            println("Failed to enable autostart: app is not installed")
+            logger.d { "Failed to enable autostart: app is not installed" }
         }
     }
 
     // Disables autostart by deleting the .desktop file in ~/.config/autostart
     override suspend fun disable() {
         val appPackageName = config.appPackageName
-        println("Disabling autostart for app: $appPackageName")
+        logger.d { "Disabling autostart for app: $appPackageName" }
         val autostartFile = Path(System.getProperty("user.home"), ".config/autostart/$appPackageName.desktop")
         if (autostartFile.exists()) {
-            println("Deleting autostart desktop file at: $autostartFile")
+            logger.d { "Deleting autostart desktop file at: $autostartFile" }
             autostartFile.deleteIfExists()
         } else {
-            println("Autostart desktop file not found at: $autostartFile")
-            println("Disabling systemd for app: $appPackageName")
+            logger.d { "Autostart desktop file not found at: $autostartFile" }
+            logger.d { "Disabling systemd for app: $appPackageName" }
             disableSystemdService(appPackageName.replace(" ", "-").lowercase())
         }
     }
