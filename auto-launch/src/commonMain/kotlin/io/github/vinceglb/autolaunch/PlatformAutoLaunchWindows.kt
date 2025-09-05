@@ -14,7 +14,7 @@ internal class PlatformAutoLaunchWindows(
                 /* key = */ REGISTRY_KEY,
                 /* value = */ config.appPackageName
             )
-            value == "cmd /c cd /d \"${Path(config.appPath).parent}\" && \"${config.appPath}\" --autostart=true"
+            value == "cmd /c start \"${config.appPackageName}\" /D \"${Path(config.appPath).parent}\" \"${config.appPath}\" --autostart=true"
         } catch (e: Win32Exception) {
             if (e.errorCode == 2) { // ERROR_FILE_NOT_FOUND
                 false
@@ -44,7 +44,7 @@ internal class PlatformAutoLaunchWindows(
             /* root = */ WinReg.HKEY_CURRENT_USER,
             /* keyPath = */ REGISTRY_KEY,
             /* name = */ config.appPackageName,
-            /* value = */ "cmd /c cd /d \"${Path(config.appPath).parent}\" && \"${config.appPath}\" --autostart=true"
+            /* value = */ "cmd /c start \"${config.appPackageName}\" /D \"${Path(config.appPath).parent}\" \"${config.appPath}\" --autostart=true"
         )
     }
 
