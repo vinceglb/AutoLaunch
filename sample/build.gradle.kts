@@ -1,29 +1,9 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.jetbrainsCompose)
-    alias(libs.plugins.compose.compiler)
-}
-
-kotlin {
-    jvm("desktop")
-
-    sourceSets {
-        val desktopMain by getting
-
-        commonMain.dependencies {
-            // Compose
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.ui)
-            implementation(compose.desktop.currentOs)
-
-            // AutoLaunch
-            implementation(projects.autoLaunch)
-        }
-    }
+    alias(libs.plugins.kotlinJvm)
+    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.composeMultiplatform)
 }
 
 compose.desktop {
@@ -36,4 +16,16 @@ compose.desktop {
             packageVersion = "1.0.0"
         }
     }
+}
+
+dependencies {
+    // Compose
+    implementation(libs.compose.runtime)
+    implementation(libs.compose.foundation)
+    implementation(libs.compose.material3)
+    implementation(libs.compose.ui)
+    implementation(compose.desktop.currentOs)
+
+    // AutoLaunch
+    implementation(projects.autoLaunch)
 }
